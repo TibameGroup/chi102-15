@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>QRcode</title>
+</head>
+    <form action="/form2" method="post">
+      <table>
+        {% for i in range(title_list|length) %}
+        <tr>
+          <th>{{title_list[i]}}</th>
+          <td>
+            <input
+              type="number"
+              name="hot"
+              class="hot"
+              value="{{test[i]}}"
+              required
+            />
+            {% if i==0 %}
+            <label>大卡</label>
+            {% else %}
+            <label>公克</label>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </form>
+    <button>儲存</button>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+        function initializeLiff(myLiffId) {
+            liff
+                .init({
+                    liffId: myLiffId
+                })
+                .then(() => {
+                    // start to use LIFF's api
+                    initializeApp();
+                })
+                .catch((err) => {
+                });
+        }
+        initializeLiff('LIFF_ID');
+      </script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <video id="video" width="480 px" height="640 px" autoplay></video>
+    <button id="snap" onclick="takePhoto()">Snap Photo</button>
+    <canvas id="canvs" width="480 px" height="640 px"></canvas>
+
+    <script>
+      const video = document.querySelector("video");
+      const canvas = document.querySelector("canvas");
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode: "environment",
+          width: { exact: video.width },
+          height: { exact: video.height },
+        },
+      };
+      const getCameraStream = async (video) => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = stream;
+        } catch (err) {
+          console.error("Error accessing camera:", err);
+        }
+      };
+
+      let takePhoto = () => {
+        let canvas = document.querySelector("canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.translate(video.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageDataURL = canvas.toDataURL("image/jpeg");
+
+        fetch("/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ image: imageDataURL }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log("Server response:", data))
+          .catch((error) => console.error("Error sending image:", error));
+      };
+
+      getCameraStream(video);
+    </script>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+      function initializeLiff(myLiffId) {
+        liff
+          .init({
+            liffId: myLiffId,
+          })
+          .then(() => {
+            // start to use LIFF's api
+            initializeApp();
+          })
+          .catch((err) => {});
+      }
+
+      initializeLiff("LIFF_ID");
+      document.getElementById("OS").innerHTML = liff.getOS();
+      document.getElementById("Language").innerHTML = liff.getLanguage();
+    </script>
+  </body>
+</html>
+
+{% comment %} setTimeout(() => { // Hide the photo element and display the video
+video.style.display = "block"; photo.style.display = "none"; // Restart the
+video stream getCameraStream(video); }, 3000); // 3 seconds delay, adjust as
+needed }; {% endcomment %}
